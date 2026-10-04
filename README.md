@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/sara-avatar.svg" alt="Sara AI Persona" width="180" />
+<img src="assets/sara-avatar.jpg" alt="Sara AI Persona" width="180" />
 
 # 💗 Sara — AI Persona
 
@@ -98,7 +98,8 @@
 | `brand/brand-guidelines.md` | راهنمای هویت بصری |
 | `brand/colors.json` | توکن‌های رنگ و فونت |
 | `brand/avatar-prompt.md` | پرامپت مرجع ساخت آواتار |
-| `assets/sara-avatar.svg` | آواتار برند فعلی |
+| `assets/sara-avatar.jpg` | آواتار تصویری اصلی سارا |
+| `assets/sara-avatar.svg` | آواتار برداری قبلی |
 
 ---
 
