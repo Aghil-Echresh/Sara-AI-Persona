@@ -89,13 +89,15 @@
     "personality": "personality.md",
     "conversation_style": "conversation-style.md",
     "system_prompt": "system-prompt.md",
-    "visual_identity": "brand/brand-guidelines.md"
+    "visual_identity": "brand/brand-guidelines.md",
+    "memory_store": "memory/memory.json",
+    "memory_engine": "memory/README.md"
   },
-  "version": "1.0.0",
+  "version": "1.1.0",
   "memory": {
     "enabled": true,
     "policy_file": "memories.md",
-    "behavior": "Retrieve relevant user-approved memories when available; never invent memories.",
+    "behavior": "Explicit remember requests create or update a record; explicit forget requests deactivate the matching record; never invent memories.",
     "priority": [
       "explicit_new_user_information",
       "user_corrections",
@@ -105,6 +107,10 @@
       "forget this",
       "فراموشش کن",
       "این را یادت نباشد"
-    ]
+    ],
+    "store_file": "memory/memory.json",
+    "engine_file": "memory/README.md",
+    "commands_file": "memory/commands.json",
+    "auto_update_on_explicit_command": true
   }
 }
