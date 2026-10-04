@@ -119,26 +119,20 @@
 
 ---
 
-## 🧠 API حافظه
+## 🧠 حافظهٔ واقعی
 
-برای اجرای واقعی دستورهای حافظه، endpoint سرورلس `api/memory.js` اضافه شده است.
+نسخهٔ فعلی سارا از **Supabase Auth + Edge Functions + PostgreSQL + RLS** استفاده می‌کند.
 
-### فرمان‌های پشتیبانی‌شده
+- ورود بدون رمز با ایمیل (Magic Link یا OTP)
+- حافظهٔ جداگانه برای هر کاربر
+- ذخیره، جست‌وجو، و حذف خاطرات
+- جلوگیری از ثبت دوبارهٔ یک خاطرهٔ یکسان
+- تزریق حافظه‌های مرتبط به context گفت‌وگوی سارا
+- کلید خصوصی مدل فقط در Secrets سمت سرور نگهداری می‌شود
 
-- `POST /api/memory` با `{\"message\":\"به خاطر بسپار ...\"}` برای ایجاد/به‌روزرسانی حافظه
-- `POST /api/memory` با `{\"message\":\"فراموشش کن ...\"}` برای غیرفعال‌کردن حافظه
-- `POST /api/memory` با `{\"action\":\"remember\",\"fact\":\"...\"}` یا `{\"action\":\"forget\",\"fact\":\"...\"}` برای API مستقیم
-- `GET /api/memory` برای دریافت حافظه‌های فعال
+Endpointهای فعال:
 
-### امنیت
+- `/functions/v1/sara-memory`
+- `/functions/v1/sara-chat`
 
-API با `Authorization: Bearer <MEMORY_API_KEY>` محافظت می‌شود و توکن GitHub فقط باید به‌صورت Secret در محیط اجرای سرور قرار بگیرد.
-
-متغیرهای لازم در `.env.example` ثبت شده‌اند:
-- `GITHUB_TOKEN`
-- `GITHUB_OWNER`
-- `GITHUB_REPO`
-- `GITHUB_BRANCH`
-- `MEMORY_API_KEY`
-
-API تغییرات را مستقیماً در `memory/memory.json` ذخیره و با یک commit در Git ثبت می‌کند.
+فایل `api/memory.js` قدیمی است و برای GitHub Pages به‌تنهایی اجرا نمی‌شود؛ مسیر اصلی حافظه در حال حاضر Supabase Edge Function است.
