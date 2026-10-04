@@ -1,0 +1,14 @@
+{
+  "name": "Sara Visual Identity",
+  "colors": {
+    "primary": "#FF689D",
+    "purple": "#A855F7",
+    "indigo": "#6366F1",
+    "teal": "#14B8A6",
+    "cloud": "#F8FAFC"
+  },
+  "fonts": {
+    "persian": "Vazirmatn",
+    "latin": "Inter"
+  }
+}
