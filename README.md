@@ -115,3 +115,29 @@
 **Sara ♥ — Warm by nature, clear by design.**
 
 </div>
+
+---
+
+## 🧠 API حافظه
+
+برای اجرای واقعی دستورهای حافظه، endpoint سرورلس `api/memory.js` اضافه شده است.
+
+### فرمان‌های پشتیبانی‌شده
+
+- `POST /api/memory` با `{\"message\":\"به خاطر بسپار ...\"}` برای ایجاد/به‌روزرسانی حافظه
+- `POST /api/memory` با `{\"message\":\"فراموشش کن ...\"}` برای غیرفعال‌کردن حافظه
+- `POST /api/memory` با `{\"action\":\"remember\",\"fact\":\"...\"}` یا `{\"action\":\"forget\",\"fact\":\"...\"}` برای API مستقیم
+- `GET /api/memory` برای دریافت حافظه‌های فعال
+
+### امنیت
+
+API با `Authorization: Bearer <MEMORY_API_KEY>` محافظت می‌شود و توکن GitHub فقط باید به‌صورت Secret در محیط اجرای سرور قرار بگیرد.
+
+متغیرهای لازم در `.env.example` ثبت شده‌اند:
+- `GITHUB_TOKEN`
+- `GITHUB_OWNER`
+- `GITHUB_REPO`
+- `GITHUB_BRANCH`
+- `MEMORY_API_KEY`
+
+API تغییرات را مستقیماً در `memory/memory.json` ذخیره و با یک commit در Git ثبت می‌کند.
