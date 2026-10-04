@@ -20,9 +20,13 @@ button.alt{background:#f1eef6;color:#25232d}.row{display:flex;gap:8px}.row input
 <section class="card">
 <header><img src="assets/sara-avatar.jpg" alt="سارا"><div><h1>سارا 💗</h1><div class="small">گفت‌وگوی طبیعی + حافظهٔ واقعی و خصوصی</div></div></header>
 <div id="auth">
-<p>ایمیلت را وارد کن تا یک <b>کد ۶ رقمی</b> برایت ارسال شود.</p>
-<div class="row"><input id="email" type="email" autocomplete="email" placeholder="ایمیل"><button id="login">ارسال کد</button></div>
+<p>بدون رمز و بدون ثبت‌نام وارد شو. اگر بخواهی، می‌توانی بعداً با ایمیل هم ورود امن داشته باشی.</p>
+<div class="row"><button id="guest">ورود فوری بدون رمز</button><button class="alt" id="emailMode">ورود با ایمیل</button></div>
+<div id="emailBox" class="hidden">
+<input id="email" type="email" autocomplete="email" placeholder="ایمیل">
+<div class="row"><button id="login">ارسال کد ۶ رقمی</button><button class="alt" id="backGuest">بازگشت</button></div>
 <div id="otpBox" class="hidden"><input id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="کد ۶ رقمی"><div class="row"><button id="verify">تأیید کد</button><button class="alt" id="resend">ارسال دوباره</button></div></div>
+</div>
 </div>
 <div id="userbar" class="hidden"><span id="who"></span> <button class="alt" id="logout">خروج</button></div>
 <div id="status" class="small"></div>
@@ -46,9 +50,9 @@ async function send(){const i=$("message"),text=i.value.trim();if(!text)return;i
 function showApp(s){const on=!!s;$("auth").classList.toggle("hidden",on);$("userbar").classList.toggle("hidden",!on);$("chatCard").classList.toggle("hidden",!on);$("memoryCard").classList.toggle("hidden",!on);if(s){$("who").textContent="وارد شدی: "+(s.user.email||"کاربر");$("status").textContent="حافظه آماده است. 💗";loadMem();if(!$("chat").children.length)add("assistant","سلام 🌷 من سارا هستم. بگو از کجا شروع کنیم؟")}else $("status").textContent="برای استفاده از حافظه وارد شو."}
 sb.auth.onAuthStateChange((_,s)=>showApp(s));
 
-async function sendOtp(){const email=$("email").value.trim();if(!email){$("status").textContent="ایمیل را وارد کن.";return}$("login").disabled=true;$("status").textContent="در حال ارسال کد ۶ رقمی… 📩";try{const{error}=await sb.auth.signInWithOtp({email,options:{shouldCreateUser:true}});if(error)throw error;$("otpBox").classList.remove("hidden");$("status").textContent="کد ۶ رقمی ارسال شد. صندوق ورودی و Spam را بررسی کن. 📩";$("otp").focus()}catch(e){$("status").textContent="ارسال کد ناموفق بود: "+(e?.message||"خطای نامشخص")}finally{$("login").disabled=false}}
-async function verifyOtp(){const email=$("email").value.trim(),token=$("otp").value.trim();if(!email||!/^[0-9]{6}$/.test(token)){$("status").textContent="ایمیل و کد ۶ رقمی معتبر را وارد کن.";return}$("verify").disabled=true;$("status").textContent="در حال بررسی کد…";try{const{data,error}=await sb.auth.verifyOtp({email,token,type:"email"});if(error)throw error;if(!data.session)throw Error("کد تأیید شد اما نشست ورود ساخته نشد.");$("status").textContent="ورود با موفقیت انجام شد. 💗"}catch(e){$("status").textContent="کد نامعتبر یا منقضی شده است: "+(e?.message||"")}finally{$("verify").disabled=false}}
-$("login").onclick=sendOtp;$("resend").onclick=sendOtp;$("verify").onclick=verifyOtp;$("otp").onkeydown=e=>{if(e.key==="Enter")verifyOtp()};
-window.addEventListener("load",()=>{const h=new URLSearchParams(location.hash.slice(1));if(h.get("error_description"))$("status").textContent="خطای ورود: "+h.get("error_description")});
+async function guestLogin(){ $("guest").disabled=true;$("status").textContent="در حال ورود بدون رمز…";try{const{data,error}=await sb.auth.signInAnonymously();if(error)throw error;$("status").textContent="ورود بدون رمز انجام شد. 💗"}catch(e){$("status").textContent="ورود بدون رمز در Supabase فعال نیست: "+(e?.message||"خطای نامشخص")}finally{$("guest").disabled=false}}
+async function sendOtp(){const email=$("email").value.trim();if(!email){$("status").textContent="ایمیل را وارد کن.";return}$("login").disabled=true;$("status").textContent="در حال ارسال کد ۶ رقمی… 📩";try{const{error}=await sb.auth.signInWithOtp({email,options:{shouldCreateUser:true}});if(error)throw error;$("otpBox").classList.remove("hidden");$("status").textContent="کد ۶ رقمی ارسال شد. 📩";$("otp").focus()}catch(e){$("status").textContent="ارسال کد ناموفق بود: "+(e?.message||"خطای نامشخص")}finally{$("login").disabled=false}}
+async function verifyOtp(){const email=$("email").value.trim(),token=$("otp").value.trim();if(!email||!/^[0-9]{6}$/.test(token)){$("status").textContent="ایمیل و کد ۶ رقمی معتبر را وارد کن.";return}$("verify").disabled=true;try{const{data,error}=await sb.auth.verifyOtp({email,token,type:"email"});if(error)throw error;if(!data.session)throw Error("نشست ورود ساخته نشد.");$("status").textContent="ورود با موفقیت انجام شد. 💗"}catch(e){$("status").textContent="کد نامعتبر یا منقضی شده است: "+(e?.message||"")}finally{$("verify").disabled=false}}
+$("guest").onclick=guestLogin;$("emailMode").onclick=()=>{$("emailBox").classList.remove("hidden");$("emailMode").classList.add("hidden")};$("backGuest").onclick=()=>{$("emailBox").classList.add("hidden");$("emailMode").classList.remove("hidden")};$("login").onclick=sendOtp;$("resend").onclick=sendOtp;$("verify").onclick=verifyOtp;$("otp").onkeydown=e=>{if(e.key==="Enter")verifyOtp()};
 $("send").onclick=send;$("message").onkeydown=e=>{if(e.key==="Enter")send()};$("refresh").onclick=loadMem;$("search").oninput=loadMem;$("logout").onclick=()=>sb.auth.signOut();
 </script></body></html>
