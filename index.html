@@ -1,59 +1,47 @@
 <!doctype html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>سارا — حافظه واقعی</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>سارا — چت با حافظه واقعی</title>
 <style>
-body{margin:0;font-family:system-ui,sans-serif;background:#f7f7fb;color:#20202a}
-main{max-width:720px;margin:40px auto;padding:20px}
-.card{background:white;border-radius:22px;padding:24px;box-shadow:0 10px 35px #0001;margin-bottom:18px}
-img{width:92px;height:92px;border-radius:50%;object-fit:cover}
-input,button{font:inherit;padding:12px;border-radius:12px;border:1px solid #ddd}
-input{width:100%;box-sizing:border-box;margin:8px 0}
-button{cursor:pointer;border:0;background:#20202a;color:white;margin:4px}
-.memory{padding:12px;border:1px solid #eee;border-radius:14px;margin:8px 0;display:flex;justify-content:space-between;gap:10px}
-.small{color:#777;font-size:.9rem}
-#status{margin-top:10px}
+:root{font-family:Vazirmatn,system-ui,sans-serif}*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#fff7fb,#f7f5ff);color:#24232d}
+main{max-width:820px;margin:auto;padding:18px}.card{background:#fff;border:1px solid #eee;border-radius:24px;padding:20px;box-shadow:0 12px 40px #0000000b;margin-bottom:16px}
+header{display:flex;align-items:center;gap:14px}header img{width:72px;height:72px;border-radius:50%;object-fit:cover}
+h1,h2{margin:.2em 0}p{line-height:1.8}.small{color:#777;font-size:.9rem}
+input,button{font:inherit;border-radius:14px;padding:12px;border:1px solid #ddd}input{width:100%;margin:6px 0}button{cursor:pointer;background:#25232d;color:#fff;border:0}
+button.alt{background:#f1eef6;color:#25232d}.row{display:flex;gap:8px}.row input{flex:1}
+#chat{height:52vh;min-height:360px;overflow:auto;padding:8px;background:#faf9fc;border-radius:18px}
+.msg{max-width:84%;padding:12px 14px;border-radius:18px;margin:8px 0;white-space:pre-wrap;line-height:1.8}.user{background:#eee9f5;margin-right:auto}.assistant{background:#ffeaf2;margin-left:auto}
+#status{min-height:24px;margin-top:8px}.memory{padding:10px;border:1px solid #eee;border-radius:14px;margin:7px 0}
+.hidden{display:none}
 </style>
 </head>
 <body>
 <main>
 <section class="card">
-<img src="assets/sara-avatar.jpg" alt="سارا">
-<h1>سارا 🧠</h1>
-<p>حافظهٔ واقعی و دائمی سارا با Supabase</p>
-<p class="small">حافظه‌ها فقط برای حساب کاربری خودت قابل مشاهده هستند.</p>
-<input id="email" type="email" placeholder="ایمیل برای ورود">
-<button id="login">ورود با لینک امن</button>
+<header><img src="assets/sara-avatar.jpg" alt="سارا"><div><h1>سارا 💗</h1><div class="small">گفت‌وگوی طبیعی + حافظهٔ واقعی و خصوصی</div></div></header>
+<div id="auth"><p>برای داشتن حافظهٔ دائمی، با ایمیل وارد شو.</p><div class="row"><input id="email" type="email" placeholder="ایمیل"><button id="login">ورود امن</button></div></div>
+<div id="userbar" class="hidden"><span id="who"></span> <button class="alt" id="logout">خروج</button></div>
 <div id="status" class="small"></div>
 </section>
-
-<section class="card" id="memoryCard" hidden>
-<h2>حافظه‌های سارا</h2>
-<input id="memory" placeholder="مثلاً: من قهوه تلخ دوست دارم">
-<button id="save">به خاطر بسپار</button>
-<input id="search" placeholder="جست‌وجو در حافظه">
-<div id="list"></div>
-<button id="logout">خروج</button>
+<section class="card hidden" id="chatCard">
+<h2>گفت‌وگو</h2><div id="chat"></div>
+<div class="row" style="margin-top:10px"><input id="message" placeholder="مثلاً: به خاطر بسپار من عقیل هستم"><button id="send">ارسال</button></div>
+<p class="small">برای ذخیرهٔ خاطره: «به خاطر بسپار ...» — برای حذف: «فراموشش کن ...»</p>
+</section>
+<section class="card hidden" id="memoryCard">
+<h2>🧠 حافظه‌های من</h2><div class="row"><input id="search" placeholder="جست‌وجو"><button id="refresh">تازه‌سازی</button></div><div id="list"></div>
 </section>
 </main>
-
 <script type="module">
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-const SUPABASE_URL="https://fzrrtdhmrbuwsnwzjkoq.supabase.co";
-const SUPABASE_KEY="sb_publishable_wAgPILCmdEwUwcKMRpohkA_ZFL7I0TM";
-const API=SUPABASE_URL+"/functions/v1/sara-memory";
-const supabase=createClient(SUPABASE_URL,SUPABASE_KEY);
-const $=id=>document.getElementById(id);
-async function session(){const {data}=await supabase.auth.getSession(); return data.session}
-async function api(path="",opts={}){const s=await session(); if(!s) throw Error("ابتدا وارد شو."); const r=await fetch(API+path,{...opts,headers:{"Content-Type":"application/json","Authorization":"Bearer "+s.access_token}}); const d=await r.json(); if(!r.ok) throw Error(d.error||"خطا"); return d}
-async function load(){try{const d=await api("?q="+encodeURIComponent($("search").value)); $("list").innerHTML=d.memories.map(m=>`<div class="memory"><span>${m.memory}</span><button data-id="${m.id}">حذف</button></div>`).join("")||'<p class="small">هنوز خاطره‌ای ثبت نشده.</p>'; document.querySelectorAll("[data-id]").forEach(b=>b.onclick=async()=>{await api("",{method:"DELETE",body:JSON.stringify({id:b.dataset.id})});load()})}catch(e){$("status").textContent=e.message}}
-supabase.auth.onAuthStateChange(async(_event,s)=>{if(s){$("memoryCard").hidden=false;$("status").textContent="وارد شدی؛ حافظه آماده است. 💗";load()}else $("memoryCard").hidden=true});
-$("login").onclick=async()=>{const email=$("email").value.trim();if(!email)return $("status").textContent="ایمیل را وارد کن.";const {error}=await supabase.auth.signInWithOtp({email,options:{emailRedirectTo:location.href}});$("status").textContent=error?error.message:"لینک ورود به ایمیلت فرستاده شد. 📩"};
-$("save").onclick=async()=>{const memory=$("memory").value.trim();if(!memory)return;await api("",{method:"POST",body:JSON.stringify({memory,importance:4})});$("memory").value="";load()};
-$("search").oninput=load;
-$("logout").onclick=()=>supabase.auth.signOut();
-</script>
-</body>
-</html>
+import{createClient}from"https://esm.sh/@supabase/supabase-js@2";
+const URL="https://fzrrtdhmrbuwsnwzjkoq.supabase.co",KEY="sb_publishable_wAgPILCmdEwUwcKMRpohkA_ZFL7I0TM",MEMORY=URL+"/functions/v1/sara-memory",CHAT=URL+"/functions/v1/sara-chat",sb=createClient(URL,KEY),$=id=>document.getElementById(id);let history=[];
+async function session(){return(await sb.auth.getSession()).data.session}
+async function api(url,opts={}){const s=await session();if(!s)throw Error("ابتدا وارد شو.");const r=await fetch(url,{...opts,headers:{"Content-Type":"application/json","Authorization":"Bearer "+s.access_token}}),d=await r.json();if(!r.ok)throw Error(d.error||"خطا");return d}
+function add(role,text){const e=document.createElement("div");e.className="msg "+role;e.textContent=text;$("chat").appendChild(e);$("chat").scrollTop=$("chat").scrollHeight}
+async function loadMem(){try{const d=await api(MEMORY+"?q="+encodeURIComponent($("search").value));$("list").innerHTML=d.memories.map(m=>`<div class="memory"><span>${m.memory}</span> <button class="alt" data-id="${m.id}">حذف</button></div>`).join("")||'<p class="small">هنوز خاطره‌ای ثبت نشده.</p>';document.querySelectorAll("[data-id]").forEach(b=>b.onclick=async()=>{await api(MEMORY,{method:"DELETE",body:JSON.stringify({id:b.dataset.id})});loadMem()})}catch(e){$("status").textContent=e.message}}
+async function send(){const i=$("message"),text=i.value.trim();if(!text)return;i.value="";add("user",text);$("send").disabled=true;try{const d=await api(CHAT,{method:"POST",body:JSON.stringify({message:text,history})});add("assistant",d.answer);history.push({role:"user",content:text},{role:"assistant",content:d.answer});if(/^\s*(به خاطر بسپار|یادت باشه|این رو ثبت کن|این رو به حافظه اضافه کن|یادت بمونه)\s*[:：-]?/i.test(text))loadMem()}catch(e){add("assistant","خطا: "+e.message)}finally{$("send").disabled=false}}
+sb.auth.onAuthStateChange(async(_,s)=>{const on=!!s;$("auth").classList.toggle("hidden",on);$("userbar").classList.toggle("hidden",!on);$("chatCard").classList.toggle("hidden",!on);$("memoryCard").classList.toggle("hidden",!on);if(s){$("who").textContent="وارد شدی: "+(s.user.email||"کاربر");$("status").textContent="حافظه آماده است. 💗";loadMem();if(!$("chat").children.length)add("assistant","سلام 🌷 من سارا هستم. بگو از کجا شروع کنیم؟")}else $("status").textContent="برای استفاده از حافظه وارد شو."});
+$("login").onclick=async()=>{const email=$("email").value.trim();if(!email)return $("status").textContent="ایمیل را وارد کن.";const{error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:location.href}});$("status").textContent=error?error.message:"لینک ورود فرستاده شد. 📩"};
+$("send").onclick=send;$("message").onkeydown=e=>{if(e.key==="Enter")send()};$("refresh").onclick=loadMem;$("search").oninput=loadMem;$("logout").onclick=()=>sb.auth.signOut();
+</script></body></html>
