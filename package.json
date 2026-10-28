@@ -1,0 +1,12 @@
+{
+  "name": "sara-ai-persona-tests",
+  "private": true,
+  "version": "1.0.0",
+  "description": "End-to-end tests for Sara AI Persona",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0"
+  }
+}
